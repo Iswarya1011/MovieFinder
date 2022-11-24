@@ -1,6 +1,28 @@
 import streamlit as st 
 import pandas as pd
+import numpy as np
 import plotly.express as px
+
+def closeFilms(film_name, df, r=0.5, cols=range(10)):
+
+    dataf = df.copy()
+    
+    i = dataf.loc[dataf['name'] == film_name]
+
+    
+    dataf["dist"] = 0
+    for c in cols:
+        dataf["tempDist"] = dataf[c].apply(lambda x : (x-i[c])**2)
+        dataf["dist"] += dataf["tempDist"]
+
+    dataf["dist"] = dataf["dist"].apply(lambda x : np.sqrt(x))
+    
+    dataf.drop(columns=["tempDist"], inplace=True)
+    
+    dataf = dataf[dataf["dist"]<r]
+    dataf = dataf.sortvalues("dist")
+
+    return dataf
 
 
 st.title('This is my first app!')
@@ -38,10 +60,6 @@ with st.sidebar:
         st.text("")
         st.text("")
         search_submit = st.form_submit_button()
-  if search_submit:
-    st.success("You searched for {}".format(search_term))
-
-
   
 
 st.write(df)
@@ -59,3 +77,8 @@ fig.update_layout(
     )
 
 st.plotly_chart(fig)
+
+if search_submit:
+    st.success("You searched for {}".format(search_term))
+    df_result = df.loc[df['name'].str.contains(search_term, case=False)]
+    st.write(df_result)

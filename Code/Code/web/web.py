@@ -27,6 +27,13 @@ def closeFilms(film_name, df, r=0.5, cols=["0","1","2","3","4","5","6","7","8","
 
     return dataf
 
+FILM_HTML_TEMPLATE = """
+<div>
+<h4>{}</h4>
+<h5>{}</h5>
+</div>
+"""
+
 with st.sidebar:
     selected = option_menu(
         menu_title = "Main Menu",
@@ -36,8 +43,8 @@ with st.sidebar:
 if selected == "Home":
     st.title('Home')
 if selected == "Movie Finder":
-    st.title('This is my first app!')
-    st.write('This is a table')
+    st.title('Movie Finder WebApp')
+    st.write('This is our database')
 
     df = pd.read_csv("all_films.csv",sep=";")
 
@@ -60,7 +67,7 @@ if selected == "Movie Finder":
 
     with st.sidebar:
         st.header("Search your Films !")
-        filter = st.multiselect('Genres', s)
+        filter = st.multiselect("By Genre", s)
         
         if len(filter) != 0:
             is_in = []
@@ -70,6 +77,8 @@ if selected == "Movie Finder":
                 else:
                     is_in.append(0)
             df['is_in'] = is_in
+
+        st.write("By writing the film title :")
 
         with st.form(key = 'searchform'):
             nav1,nav2 = st.columns([2,1])
@@ -81,8 +90,8 @@ if selected == "Movie Finder":
                 st.text("")
                 search_submit = st.form_submit_button()
         
-        st.title("Our recommendations")
-        st.write("Input a Film Name we will choose the right film for you !")
+        st.header("Our recommendations for you")
+        st.write("Write a Film Name and we will choose the right film for you !")
         
         with st.form(key = 'searchform2'):
             nav1,nav2 = st.columns([2,1])
@@ -99,10 +108,10 @@ if selected == "Movie Finder":
 
     data = pd.read_csv('data_famd_web.csv', sep =';')
     data.drop_duplicates(["name"], inplace=True)
-    st.write("Distances")
+    st.write("Database with Distances")
     st.write(data)
 
-    st.write('FAMD')
+    st.write('FAMD 3D plot')
 
     fig = px.scatter_3d(data, x='4', y='1', z='2', color='3')
 
@@ -112,12 +121,27 @@ if selected == "Movie Finder":
         )
 
     st.plotly_chart(fig)
-    try:
-        if len(filter) != 0:
+
+    if len(filter) != 0:
+        try:
             st.title('Research by genre')
-            st.write(df[df['is_in']== 1])
-    except:
-        st.error('This is an error', icon="🚨")
+            genre_results = df[df['is_in']== 1]
+            genre_results = genre_results.reset_index()
+            num_genre_results = len(genre_results)
+            st.write(genre_results)
+            st.subheader("{} results".format(num_genre_results))
+
+            for i in range(len(genre_results)):
+                title = genre_results['name'][i]
+                year = genre_results['year'][i]
+                film_desc = genre_results['text-muted'][i]
+                st.markdown(FILM_HTML_TEMPLATE.format(str(title),str(year)), unsafe_allow_html=True)
+
+                with st.expander('Description'):
+                    st.write(film_desc)
+
+        except:
+            st.error('This is an error')
 
     if search_submit:
         st.success("You searched for {}".format(search_term))
@@ -142,11 +166,6 @@ if selected == "Movie Finder":
 
         st.plotly_chart(fig)
     
-    
-
-    
+  
 if selected == "About":
     st.title("About us")
-
-
-

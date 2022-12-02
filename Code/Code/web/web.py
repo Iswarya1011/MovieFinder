@@ -83,6 +83,8 @@ if selected == "Movie Finder":
     st.write('This is our database')
 
     df = pd.read_csv("all_films.csv",sep=";")
+    df.drop(df.columns[0], inplace=True, axis=1)
+    # df = df.drop_duplicates(subset=["name"])
     
 
     genres = []
@@ -235,7 +237,8 @@ if selected == "Movie Finder":
             ),
             title={
                 "text":f"Films en rapport avec {df_result2['name'][0]}"
-            }
+            },
+            backgroundcolor="rgb(230, 230,200)"
         )
         
         name = df_result2["name"][0]

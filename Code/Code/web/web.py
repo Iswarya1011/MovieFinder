@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import streamlit as st 
 from streamlit_option_menu import option_menu 
 import pandas as pd
@@ -148,7 +150,6 @@ if selected == "Movie Finder":
 
     data = pd.read_csv('data_famd_web.csv', sep =';')
     data.drop_duplicates(["name"], inplace=True)
-    data = data.drop(columns=["Unnamed: 0"])
     st.write("Database with Distances")
     st.write(data)
 
